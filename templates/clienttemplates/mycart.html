@@ -1,0 +1,48 @@
+{% extends 'clienttemplates/base.html' %}
+
+{% block content %}
+<h3 class="mt-3">My Cart</h3>
+{% if cart %}
+<div class="row">
+    <div class="col-md-12">
+        <h4>Items in the cart</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Product</th>
+                    <th>Rate</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cp in cart.cartproduct_set.all %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{cp.product.title}}</td>
+                    <td>{{cp.rate}}</td>
+                    <td>{{cp.quantity}}</td>
+                    <td>{{cp.subtotal}}</td>
+                    <td>
+                        <a href="{% url 'ecomapp:managecart' cp.id 'pls' %}" class="btn btn-info">+</a>
+                        <a href="{% url 'ecomapp:managecart' cp.id 'min' %}" class="btn btn-warning">-</a>
+                        <a href="{% url 'ecomapp:managecart' cp.id 'rmv'  %}" class="btn btn-danger">X</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <th colspan="4" class="text-right">Total</th>
+                    <th>{{cart.total}}</th>
+                    <th><a href="">Empty Cart</a></th>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<h3>YOu dont have cart</h3>
+{% endif %}
+
+{% endblock %}

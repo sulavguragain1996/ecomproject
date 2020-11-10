@@ -1,0 +1,29 @@
+{% extends 'clienttemplates/base.html' %}
+
+
+{% block content %}
+<div class='row'>
+    <div class=col-6>
+        <img src="{{productdetail.image.url}}" alt="" class="img-fluid">
+    </div>
+    <div class='col-6'>
+        <h3>Title: <span style="color: rgb(22, 24, 153);">{{productdetail.title}}</span></h3>
+        <h3>Category: <span class="text-info">{{productdetail.category}}</span></h3>
+        <p>{{productdetail.warrentry}}</p>
+        <p> price:<span style="text-decoration: line-through;"> Rs. {{productdetail.marked_price}}</span> Rs.
+            {{productdetail.selling_price}}
+        </p>
+        <p> VIEWS::{{productdetail.view_count}}</p>
+        <a href="{% url 'ecomapp:addtocart' productdetail.slug %}" class='btn btn-info'>ADD TO CART</a>
+    </div>
+</div>
+<div class="row">
+    <div class='col-12'>
+        <p>{{productdetail.description}}</p>
+
+    </div>
+
+</div>
+
+
+{% endblock %}

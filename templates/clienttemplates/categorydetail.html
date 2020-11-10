@@ -1,0 +1,27 @@
+{% extends 'clienttemplates/base.html' %}
+
+{% block content %}
+<h3 class="m-3">We are viewing <span style="color: coral;">{{category}}</span> category</h3>
+
+<div class='row'>
+    {% for cat in categoryproducts %}
+    <div class="col-3 p-5" style="border: 1px solid red;">
+        <img class="img-fluid" src="{{cat.image.url}}" alt="" style="height: 150px; object-fit: contain;">
+        <hr>
+        <h4><a href="{% url 'ecomapp:productdetail' cat.slug %}">{{cat.title}}</a></h4>
+        <p> price:<span style="text-decoration: line-through;"> Rs. {{cat.marked_price}}</span> Rs.
+            {{cat.selling_price}}
+        </p>
+
+    </div>
+
+    {% endfor %}
+</div>
+<!-- <p>Selected Category: {{category}}</p>
+<ul>
+    {% for product in categoryproducts %}
+    <li>{{product.title}}</li>
+    {% endfor %}
+</ul> -->
+
+{% endblock %}

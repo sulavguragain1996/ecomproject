@@ -1,0 +1,52 @@
+{% extends 'clienttemplates/base.html' %}
+
+{% block content %}
+<br>
+
+<h3 style="text-align: center;"> ecommerce website </h3>
+<br>
+<div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+  <ol class="carousel-indicators">
+    <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+    <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+    <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
+  </ol>
+  <div class="carousel-inner">
+    {% for slider in allsliders %}
+    <div class="carousel-item {% if forloop.counter == 1 %}active{% endif %}">
+      <img src="{{slider.image.url}}" class="d-block w-100" alt="..." style="height: 400px; object-fit: cover;">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>{{slider.title}}</h5>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
+
+{% for i in allcategory %}
+<h3>Category: <span style="color: rgb(92, 216, 43);"> {{i.title}}</span></h3>
+<hr>
+<div class="row">
+  {% for p in i.product_set.all %}
+  <div class="col-3 p-5" style="border: 1px solid red;">
+    <img class="img-fluid" src="{{p.image.url}}" alt="" style="height: 150px; object-fit: contain;">
+    <hr>
+    <h4><a href="{% url 'ecomapp:productdetail' p.slug %}">{{p.title}}</a></h4>
+    <p> price:<span style="text-decoration: line-through;"> Rs. {{p.marked_price}}</span> Rs. {{p.selling_price}}</p>
+
+  </div>
+  {% endfor %}
+</div>
+
+
+{% endfor %}
+
+{% endblock %}
