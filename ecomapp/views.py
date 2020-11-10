@@ -128,6 +128,6 @@ class ManageCartView(View):
             cart.save()
             cp.delete()
         else:
-            print("Invalid action")
+            print("Invalid action in cart")
         # return redirect("/my-cart/")
         return redirect("ecomapp:mycart")
