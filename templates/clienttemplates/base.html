@@ -44,7 +44,8 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'ecomapp:mycart' %}"> <span class="fa fa-cart-plus"></span>
-                        Cart</a>
+                        Cart ({% if mycart.cartproduct_set.count > 0 %}{{mycart.cartproduct_set.count}}{% else %}0
+                        {% endif %})</a>
                 </li>
 
             </ul>

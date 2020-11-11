@@ -17,5 +17,13 @@ urlpatterns = [
     path("add-to-cart/<sl>/", AddToCartView.as_view(), name="addtocart"),
     path("manage-cart/<cp_id>-<act>/",
          ManageCartView.as_view(), name="managecart"),
+    path("empty-cart/", EmptyCartView.as_view(), name="emptycart"),
+    path("checkout/", CheckoutView.as_view(), name="checkout"),
+
+
+    #     admin panel urls
+    path("ecom-admin/", AdminHomeView.as_view(), name="adminhome"),
+    path("ecom-admin/order-<o_id>/",
+         AdminOrderDetailView.as_view(), name="adminorderdetail"),
 
 ]

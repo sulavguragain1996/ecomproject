@@ -1,0 +1,38 @@
+{% extends 'admintemplates/adminbase.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h3 class="text-center">Welcome to Ecommerce Admin Panel</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h4>New Orders</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>SN</th>
+                    <th>Orderd_by</th>
+                    <th>Mobile</th>
+                    <th>Total</th>
+                    <th>Shipping Address</th>
+                    <th>Order Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in  neworders %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td><a href="{% url 'ecomapp:adminorderdetail' order.id %}">{{order.ordered_by}}</a></td>
+                    <td>{{order.mobile}}</td>
+                    <td>{{order.total}}</td>
+                    <td>{{order.shipping_address}}</td>
+                    <td>{{order.created_at}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
