@@ -20,10 +20,16 @@ urlpatterns = [
     path("empty-cart/", EmptyCartView.as_view(), name="emptycart"),
     path("checkout/", CheckoutView.as_view(), name="checkout"),
 
+    path("signup/", CustomerSignupView.as_view(), name="customersignup"),
+    path("signout/", CustomerSignoutView.as_view(), name="customersignout"),
+
 
     #     admin panel urls
+    path("ecom-admin/login/", AdminLoginView.as_view(), name="adminlogin"),
+    path("ecom-admin/logout/", AdminLogoutView.as_view(), name="adminlogout"),
     path("ecom-admin/", AdminHomeView.as_view(), name="adminhome"),
     path("ecom-admin/order-<o_id>/",
          AdminOrderDetailView.as_view(), name="adminorderdetail"),
+
 
 ]

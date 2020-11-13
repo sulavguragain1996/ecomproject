@@ -1,0 +1,32 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'clientstatic/css/bootstrap.min.css' %}">
+    <title>Admin Login</title>
+</head>
+
+<body class="container " style="background-color: coral;">
+    <div class="row">
+        <div class="col-md-5 mx-auto mt-5 text-white p-3"
+            style="margin-top: 200px!important;background-color: rgb(38, 170, 163);">
+            <h3 class="text-center">Admin Login Form</h3>
+            <hr>
+            {% if request.GET.st == "err" %}
+            <li class="text-warning">Invalid username or password.</li>
+            {% elif request.GET.st == "ua" %}
+            <li class="text-warning">You are not authorized to view this page. </li>
+            {% endif %}
+            <form action="" method="POST">
+                {% csrf_token %}
+                {{adminloginform.as_p}}
+                <button class="btn btn-primary btn-block">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

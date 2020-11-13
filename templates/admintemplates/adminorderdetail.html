@@ -9,14 +9,14 @@
         <h4>Customer Information </h4>
         <p><span class="font-weight-bold">Ordered by: </span>{{order.ordered_by}}</p>
         <p><span class="font-weight-bold">Shipping Address: </span>{{order.shipping_address}}</p>
-        <p><span class="font-weight-bold">Contacts: </span>{{order.mobile}}({{order.email}})</p>
+        <p><span class="font-weight-bold">Contacts: </span>{{order.mobile}}[{{order.email}}]</p>
         <p><span class="font-weight-bold">Ordered On: </span>{{order.created_at}}({{order.created_at|timesince}} ago)
         </p>
     </div>
     <div class="col-md-6">
         <h4>Payment Information</h4>
-        <p><span class="font-weight-bold">Total Amount: </span>{{order.subtotal}}</p>
-        <p><span class="font-weight-bold">Total Amount: </span>{{order.discount}}</p>
+        <p><span class="font-weight-bold">SubTotal Amount: </span>{{order.subtotal}}</p>
+        <p><span class="font-weight-bold">Total discount: </span>{{order.discount}}</p>
         <p><span class="font-weight-bold">Total Amount: </span>Rs. {{order.total|intcomma}}/-</p>
         <p><span class="font-weight-bold">Payment Via:
             </span>{{order.payment_method}}({% if order.payment_completed %}Paid {% else %}UnPaid{% endif %})</p>

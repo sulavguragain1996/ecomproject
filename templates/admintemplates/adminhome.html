@@ -1,4 +1,5 @@
 {% extends 'admintemplates/adminbase.html' %}
+{% load humanize %}
 
 {% block content %}
 <div class="row">
@@ -26,7 +27,7 @@
                     <td>{{forloop.counter}}</td>
                     <td><a href="{% url 'ecomapp:adminorderdetail' order.id %}">{{order.ordered_by}}</a></td>
                     <td>{{order.mobile}}</td>
-                    <td>{{order.total}}</td>
+                    <td>Rs:{{order.total|intcomma}}</td>
                     <td>{{order.shipping_address}}</td>
                     <td>{{order.created_at}}</td>
                 </tr>

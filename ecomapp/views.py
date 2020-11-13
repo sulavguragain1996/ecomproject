@@ -1,6 +1,9 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
-from django.views.generic import View
+from django.views.generic import View, FormView
 from django.db.models import Q
+from django.urls import reverse
 from .models import *
 from .forms import *
 
@@ -168,23 +171,26 @@ class CheckoutView(View):
         cart_id = request.session.get("cid")
         try:
             cart = Cart.objects.get(id=cart_id)
+            print("cart exists")
         except:
+            print("cart doesnot exist")
             return redirect("ecomapp:home")
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
+        print("in get method")
         cart_id = request.session.get("cid")
-        print(cart_id, "99999999999999999999999999999")
         cart = Cart.objects.get(id=cart_id)
 
         context = {
             'allcategory': Category.objects.all(),
             "mycart": cart,
-            "checkoutform": CheckoutForm
+            "checkoutform": CheckoutForm  # this is send from forms.py
         }
         return render(request, "clienttemplates/checkout.html", context)
 
     def post(self, request, *args, **kwargs):
+        print("in post method")
         cart_id = request.session.get("cid")
         cart = Cart.objects.get(id=cart_id)
         ordered_by = request.POST.get("ordered_by")
@@ -200,9 +206,118 @@ class CheckoutView(View):
         return redirect("ecomapp:home")
 
 
+# class CustomerSignupView(FormView):
+#     template_name = "clienttemplates/customersignup.html"
+#     form_class = SignupForm
+#     success_url = "/"
+#     # def get(self, request, *args, **kwargs):
+#     #     context = {
+#     #         "signupform": SignupForm
+#     #     }
+#     #     return render(request, "clienttemplates/customersignup.html", context)
+
+#     def form_valid(self, form):
+#         email = form.cleaned_data.get("email")
+#         password = form.cleaned_data.get("password")
+#         full_name = form.cleaned_data.get("full_name")
+#         address = form.cleaned_data.get("address")
+#         # to create user, use User.objects.create_user(username, email, password)
+#         user = User.objects.create_user(email, email, password)
+#         customer = Customer.objects.create(
+#             user=user, full_name=full_name, address=address)
+#         login(self.request, user)
+#         return super().form_valid(form)
+
+
+class CustomerSignupView(FormView):
+    def get(self, request, *args, **kwargs):
+        context = {
+            "signupform": SignupForm
+        }
+        return render(request, "clienttemplates/customersignup.html", context)
+
+    def post(self, request, *args, **kwargs):
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+        full_name = request.POST.get("full_name")
+        address = request.POST.get("address")
+        # to create user, use User.objects.create_user(username, email, password)
+        if password != confirm_password:
+            context = {
+                "signupform": SignupForm,
+                "err": "Passwords didnot match. "
+            }
+            return render(request, "clienttemplates/customersignup.html", context)
+        try:
+            user = User.objects.create_user(email, email, password)
+            customer = Customer.objects.create(
+                user=user, full_name=full_name, address=address)
+            login(self.request, user)
+        except:
+            context = {
+                "signupform": SignupForm,
+                "err": "Email already used. "
+            }
+            return render(request, "clienttemplates/customersignup.html", context)
+        return redirect("ecomapp:home")
+
+
+class CustomerSignoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect("ecomapp:home")
+
+
 # admin views
 
+class AdminLoginView(View):
+    def get(self, request, *args, **kwargs):
+        context = {
+            "adminloginform": AdminLoginForm
+        }
+        return render(request, "admintemplates/adminlogin.html", context)
+
+    def post(self, request, *args, **kwargs):
+        uname = request.POST.get("username")
+        pword = request.POST.get("password")
+        usr = authenticate(username=uname, password=pword)
+        if usr is not None:
+            try:
+                usr.admin
+                login(request, usr)
+            except:
+                return redirect(reverse("ecomapp:adminlogin") + "?st=err")
+
+        else:
+            print(reverse("ecomapp:adminlogin"), "8888888888888888888888888")
+
+            return redirect(reverse("ecomapp:adminlogin") + "?st=err")
+        return redirect("ecomapp:adminhome")
+
+
+class AdminLogoutView(View):
+    def get(self, request):
+        logout(request)
+        return redirect("ecomapp:adminlogin")
+
+
 class AdminHomeView(View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            # if Admin.objects.filter(user=request.user).exists():
+            #     pass
+            # else:
+            #     return redirect("ecomapp:adminlogin")
+            try:
+                request.user.admin
+                # Admin.objects.get(user=request.user)
+            except:
+                return redirect(reverse("ecomapp:adminlogin") + "?st=ua")
+        else:
+            return redirect(reverse("ecomapp:adminlogin") + "?st=ua")
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         context = {
             "neworders": Order.objects.filter(order_status="Order Received").order_by("-id")
@@ -211,6 +326,16 @@ class AdminHomeView(View):
 
 
 class AdminOrderDetailView(View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                request.user.admin
+            except:
+                return redirect(reverse("ecomapp:adminlogin") + "?st=ua")
+        else:
+            return redirect(reverse("ecomapp:adminlogin") + "?st=ua")
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, o_id, *args, **kwargs):
         context = {
             "order": Order.objects.get(id=o_id)

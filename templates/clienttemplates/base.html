@@ -47,7 +47,21 @@
                         Cart ({% if mycart.cartproduct_set.count > 0 %}{{mycart.cartproduct_set.count}}{% else %}0
                         {% endif %})</a>
                 </li>
-
+                {% if request.user.is_authenticated and request.user.customer  %}
+                <li class="nav-item">
+                    <a class="nav-link">Logged in as :{{request.user}}</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'ecomapp:customersignout' %}" class="nav-link">Logout</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a href="" class="nav-link">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'ecomapp:customersignup' %}" class="nav-link">Register</a>
+                </li>
+                {% endif %}
             </ul>
             <form class="form-inline my-2 my-lg-0" action="{% url 'ecomapp:productsearch' %}">
                 <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="query">
