@@ -19,6 +19,13 @@ class HomeView (View):
         if cart_id:
             cart = Cart.objects.get(id=cart_id)
             context["mycart"] = cart
+            try:
+                c = request.user.customer
+                cart.customer = c
+                cart.save()
+            except:
+                pass
+
         return render(request, 'clienttemplates/home.html', context)
 
 
@@ -81,6 +88,12 @@ class MyCartView(View):
         if cart_id:
             cart = Cart.objects.get(id=cart_id)
             context["mycart"] = cart
+            try:
+                c = request.user.customer
+                cart.customer = c
+                cart.save()
+            except:
+                pass
         else:
             print("no cart")
 
@@ -115,6 +128,12 @@ class AddToCartView(View):
                 cart=cart, product=product, rate=product.selling_price, quantity=1, subtotal=product.selling_price)
             cart.total += product.selling_price
             cart.save()
+        try:
+            c = request.user.customer
+            cart.customer = c
+            cart.save()
+        except:
+            pass
         # steps
         # check whether user has cart already or not in session
         # if exits, get and use that cart else make a new cart and store its id to session
@@ -175,12 +194,22 @@ class CheckoutView(View):
         except:
             print("cart doesnot exist")
             return redirect("ecomapp:home")
+        # try:
+        #     request.user.customer
+        # except:
+        #     return redirect(reverse("ecomapp:customersignin")+"?next=/checkout/")
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         print("in get method")
         cart_id = request.session.get("cid")
         cart = Cart.objects.get(id=cart_id)
+        try:
+            c = request.user.customer
+            cart.customer = c
+            cart.save()
+        except:
+            pass
 
         context = {
             'allcategory': Category.objects.all(),
@@ -232,8 +261,13 @@ class CheckoutView(View):
 class CustomerSignupView(FormView):
     def get(self, request, *args, **kwargs):
         context = {
-            "signupform": SignupForm
+            "signupform": SignupForm,
+            'allcategory': Category.objects.all(),
         }
+        cart_id = request.session.get("cid")
+        if cart_id:
+            cart = Cart.objects.get(id=cart_id)
+            context["mycart"] = cart
         return render(request, "clienttemplates/customersignup.html", context)
 
     def post(self, request, *args, **kwargs):
@@ -260,13 +294,82 @@ class CustomerSignupView(FormView):
                 "err": "Email already used. "
             }
             return render(request, "clienttemplates/customersignup.html", context)
-        return redirect("ecomapp:home")
+        if "next" in request.GET:
+            return redirect(request.GET["next"])
+        else:
+            return redirect("ecomapp:home")
+
+
+class CustomerSigninView(View):
+    def get(self, request, *awarg, **kwargs):
+        context = {
+            'signinform': CustomerLoginForm,
+            'allcategory': Category.objects.all(),
+        }
+        cart_id = request.session.get("cid")
+        if cart_id:
+            cart = Cart.objects.get(id=cart_id)
+            context["mycart"] = cart
+        return render(request, 'clienttemplates/customersignview.html', context)
+
+    def post(self, request, *args, **kwargs):
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        usr = authenticate(username=email, password=password)
+        if usr:
+            try:
+                customer = usr.customer
+                login(request, usr)
+            except:
+                context = {
+                    "signinform": CustomerLoginForm,
+                    "err": "Invalid username or password. "
+                }
+                return render(request, "clienttemplates/customersignview.html", context)
+        else:
+            context = {
+                "signinform": CustomerLoginForm,
+                "err": "Invalid username or password. "
+            }
+            return render(request, "clienttemplates/customersignview.html", context)
+
+        if "next" in request.GET:
+            return redirect(request.GET["next"])
+        else:
+            return redirect("ecomapp:home")
 
 
 class CustomerSignoutView(View):
     def get(self, request):
         logout(request)
         return redirect("ecomapp:home")
+
+
+class CustomerProfileView(View):
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            customer = request.user.customer
+        except:
+            return redirect(reverse("ecomapp:customersignin")+"?next=/customer-profile/")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        customer = request.user.customer
+
+        orders = Order.objects.filter(cart__customer=customer).order_by("-id")
+
+        context = {
+            'allcategory': Category.objects.all(),
+            'customer': customer,
+            'orders': orders,
+        }
+
+        cart_id = request.session.get("cid")
+        if cart_id:
+            cart = Cart.objects.get(id=cart_id)
+            context["mycart"] = cart
+
+        return render(request, "clienttemplates/customerprofile.html", context)
 
 
 # admin views
@@ -290,8 +393,6 @@ class AdminLoginView(View):
                 return redirect(reverse("ecomapp:adminlogin") + "?st=err")
 
         else:
-            print(reverse("ecomapp:adminlogin"), "8888888888888888888888888")
-
             return redirect(reverse("ecomapp:adminlogin") + "?st=err")
         return redirect("ecomapp:adminhome")
 
@@ -341,3 +442,28 @@ class AdminOrderDetailView(View):
             "order": Order.objects.get(id=o_id)
         }
         return render(request, "admintemplates/adminorderdetail.html", context)
+
+
+class AdminOrderActionView(View):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                request.user.admin
+            except:
+                return redirect(reverse("ecomapp:adminlogin") + "?st=ua")
+        else:
+            return redirect(reverse("ecomapp:adminlogin") + "?st=ua")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, o_id, act, *args, **kwargs):
+        order = Order.objects.get(id=o_id)
+        if act == "acpt":
+            order.order_status = "Order Processing"
+        elif act == "cncl":
+            order.order_status = "Order Canceled"
+        elif act == "stc":
+            order.order_status = "On the way"
+        elif act == "dc":
+            order.order_status = "Order Completed"
+        order.save()
+        return redirect("ecomapp:adminorderdetail", o_id=o_id)

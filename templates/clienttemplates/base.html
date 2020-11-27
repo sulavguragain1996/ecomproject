@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>homepage</title>
+    <title>{% block pg-ttl %}{% endblock %}</title>
 
     <link rel="stylesheet" href="{% static 'clientstatic/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -49,14 +49,14 @@
                 </li>
                 {% if request.user.is_authenticated and request.user.customer  %}
                 <li class="nav-item">
-                    <a class="nav-link">Logged in as :{{request.user}}</a>
+                    <a class="nav-link" href="{% url 'ecomapp:customerprofile' %}">Logged in as :{{request.user}}</a>
                 </li>
                 <li class="nav-item">
                     <a href="{% url 'ecomapp:customersignout' %}" class="nav-link">Logout</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a href="" class="nav-link">Login</a>
+                    <a href="{% url 'ecomapp:customersignin' %}" class="nav-link">Login</a>
                 </li>
                 <li class="nav-item">
                     <a href="{% url 'ecomapp:customersignup' %}" class="nav-link">Register</a>

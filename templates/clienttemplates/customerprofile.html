@@ -1,0 +1,45 @@
+{% extends 'clienttemplates/base.html' %}
+
+{% block pg-ttl %}Customer Profile{% endblock %}
+
+{% block content %}
+<div class="row mt-4 mb-4">
+    <div class="col-md-6">
+        <div class="p-3">
+            <h4>My Profile</h4>
+            <hr>
+            <h5>Name: {{customer.full_name}}</h5>
+            <h5>Address: {{customer.address}}</h5>
+            <h5>Email: {{customer.user.username}}</h5>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="p-3">
+            <h4>Previous Orders</h4>
+            <hr>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>SN</th>
+                        <th>Date</th>
+                        <th>Order</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{order.created_at}}</td>
+                        <td>#ORDER_{{order.id}}</td>
+                        <td>{{order.total}}</td>
+                        <td>{{order.order_status}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

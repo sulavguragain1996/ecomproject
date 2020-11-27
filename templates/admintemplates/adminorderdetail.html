@@ -2,53 +2,77 @@
 {% load humanize %}
 
 {% block content %}
-<h4>Order Status: {{order.order_status}}</h4>
-<hr>
-<div class="row">
-    <div class="col-md-6">
-        <h4>Customer Information </h4>
-        <p><span class="font-weight-bold">Ordered by: </span>{{order.ordered_by}}</p>
-        <p><span class="font-weight-bold">Shipping Address: </span>{{order.shipping_address}}</p>
-        <p><span class="font-weight-bold">Contacts: </span>{{order.mobile}}[{{order.email}}]</p>
-        <p><span class="font-weight-bold">Ordered On: </span>{{order.created_at}}({{order.created_at|timesince}} ago)
-        </p>
+<div class=" mt-3">
+
+    <h4>Order Status: {{order.order_status}}</h4>
+    <hr>
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Customer Information </h4>
+            <p><span class="font-weight-bold">Ordered by: </span>{{order.ordered_by}}</p>
+            <p><span class="font-weight-bold">Shipping Address: </span>{{order.shipping_address}}</p>
+            <p><span class="font-weight-bold">Contacts: </span>{{order.mobile}}[{{order.email}}]</p>
+            <p><span class="font-weight-bold">Ordered On: </span>{{order.created_at}}({{order.created_at|timesince}}
+                ago)
+            </p>
+            <p><span class="font-weight-bold">Logged in Customer:
+                </span>{% if order.cart.customer %}{{order.cart.customer.user.username}}{% else %}Guest
+                Customer{% endif %}
+            </p>
+        </div>
+        <div class="col-md-6">
+            <h4>Payment Information</h4>
+            <p><span class="font-weight-bold">SubTotal Amount: </span>{{order.subtotal}}</p>
+            <p><span class="font-weight-bold">Total discount: </span>{{order.discount}}</p>
+            <p><span class="font-weight-bold">Total Amount: </span>Rs. {{order.total|intcomma}}/-</p>
+            <p><span class="font-weight-bold">Payment Via:
+                </span>{{order.payment_method}}({% if order.payment_completed %}Paid {% else %}UnPaid{% endif %})</p>
+        </div>
+        <div class="col-md-12">
+            <h4>Products in Cart</h4>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>SN</th>
+                        <th>Product</th>
+                        <th>Rate</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cp in order.cart.cartproduct_set.all %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{cp.product.title}}</td>
+                        <td>{{cp.rate}}</td>
+                        <td>{{cp.quantity}}</td>
+                        <td>{{cp.subtotal}}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <th colspan="4" class="text-right">Total</th>
+                        <th>{{order.cart.total}}</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div class="col-md-6">
-        <h4>Payment Information</h4>
-        <p><span class="font-weight-bold">SubTotal Amount: </span>{{order.subtotal}}</p>
-        <p><span class="font-weight-bold">Total discount: </span>{{order.discount}}</p>
-        <p><span class="font-weight-bold">Total Amount: </span>Rs. {{order.total|intcomma}}/-</p>
-        <p><span class="font-weight-bold">Payment Via:
-            </span>{{order.payment_method}}({% if order.payment_completed %}Paid {% else %}UnPaid{% endif %})</p>
-    </div>
-    <div class="col-md-12">
-        <h4>Products in Cart</h4>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>SN</th>
-                    <th>Product</th>
-                    <th>Rate</th>
-                    <th>Quantity</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cp in order.cart.cartproduct_set.all %}
-                <tr>
-                    <td>{{forloop.counter}}</td>
-                    <td>{{cp.product.title}}</td>
-                    <td>{{cp.rate}}</td>
-                    <td>{{cp.quantity}}</td>
-                    <td>{{cp.subtotal}}</td>
-                </tr>
-                {% endfor %}
-                <tr>
-                    <th colspan="4" class="text-right">Total</th>
-                    <th>{{order.cart.total}}</th>
-                </tr>
-            </tbody>
-        </table>
+
+    <div class="row">
+        <div class="col-md-6">
+            {% if order.order_status == "Order Received" %}
+            <a href="{% url 'ecomapp:adminorderaction' order.id 'acpt' %}" class="btn btn-primary">Accept Order</a>
+            {% elif order.order_status == "Order Processing" %}
+            <a href="{% url 'ecomapp:adminorderaction' order.id 'stc' %}" class="btn btn-primary">Send to Customer</a>
+            {% elif order.order_status == "On the way" %}
+            <a href="{% url 'ecomapp:adminorderaction' order.id 'dc' %}" class="btn btn-primary">Delivery Confirmed</a>
+            {% endif %}
+            {% if order.order_status != "Order Completed" %}
+            <a href="{% url 'ecomapp:adminorderaction' order.id 'cncl' %}" class="btn btn-danger">Cancel Order</a>
+            {% endif %}
+        </div>
     </div>
 </div>
+
 {% endblock %}

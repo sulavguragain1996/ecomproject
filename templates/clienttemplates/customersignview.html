@@ -1,0 +1,26 @@
+{% extends 'clienttemplates/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 p-3 mx-auto">
+        <h4 class="text-center">Customer signin Form</h4>
+        <hr>
+        {% if err %}
+        <li class="text-danger">{{err}}</li>
+        {% endif %}
+        <form action="" method="POST">
+            {% csrf_token %}
+            {{signinform.as_p}}
+            <button class="btn btn-info btn-block">sign in as a Customer</button>
+
+        </form>
+        <h5>Don't have an account? <a
+                href="{% url 'ecomapp:customersignup' %}{% if request.GET.next %}?next={{request.GET.next}}{% endif %}">Signup
+                Here</a></h5>
+        <br>
+        {% if request.GET.next == "/checkout/" %}
+        <a href="{% url 'ecomapp:checkout' %}" class="btn  btn-danger w-100">Or Checkout as Guest</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

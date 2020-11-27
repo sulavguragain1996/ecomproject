@@ -39,6 +39,17 @@ class AdminLoginForm(forms.Form):
     }))
 
 
+class CustomerLoginForm(forms.Form):
+    email = forms.EmailField(widget=forms.EmailInput(attrs={
+        "class": "form-control",
+        "placeholder": "Enter you email..."
+    }))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        "class": "form-control",
+        "placeholder": "Enter you password..."
+    }))
+
+
 class SignupForm(forms.Form):
     email = forms.EmailField(widget=forms.EmailInput(attrs={
         "class": "form-control",

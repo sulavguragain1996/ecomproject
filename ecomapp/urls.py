@@ -21,7 +21,10 @@ urlpatterns = [
     path("checkout/", CheckoutView.as_view(), name="checkout"),
 
     path("signup/", CustomerSignupView.as_view(), name="customersignup"),
+    path("signin/", CustomerSigninView.as_view(), name='customersignin'),
     path("signout/", CustomerSignoutView.as_view(), name="customersignout"),
+
+    path("customer-profile/", CustomerProfileView.as_view(), name="customerprofile"),
 
 
     #     admin panel urls
@@ -30,6 +33,8 @@ urlpatterns = [
     path("ecom-admin/", AdminHomeView.as_view(), name="adminhome"),
     path("ecom-admin/order-<o_id>/",
          AdminOrderDetailView.as_view(), name="adminorderdetail"),
+    path("ecom-admin/order-<o_id>/action-<act>/",
+         AdminOrderActionView.as_view(), name="adminorderaction"),
 
 
 ]

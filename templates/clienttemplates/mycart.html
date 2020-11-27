@@ -40,7 +40,8 @@
                 </tr>
             </tbody>
         </table>
-        {% if mycart.cartproduct_set.count > 0 %}<a href="{% url 'ecomapp:checkout' %}"
+        {% if mycart.cartproduct_set.count > 0 %}<a
+            href="{% if request.user.customer %}{% url 'ecomapp:checkout' %}{% else %}{% url 'ecomapp:customersignin' %}?next={% url 'ecomapp:checkout' %}{% endif %}"
             class="btn btn-info">Checkout</a>{% endif %}
         <hr>
     </div>
